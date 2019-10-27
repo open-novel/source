@@ -22,40 +22,57 @@ var vueData = {
 			name:null,
 			characters:[],
 			content:null
-		},
-		showMenu: false
+		}
 }
 if ('serviceWorker' in navigator) {
 	navigator.serviceWorker.register('./service-worker.js');
 }
-var  hash = document.location.hash;
-var  paneAry = ['ようこそ','システム','キャラクター','ストーリー','SS','ギャラリー'];
-if(hash) {
-	var array = decodeURI(hash.slice(1)).split('/');
-	var index = -1;
-	$.each(paneAry, function(i,n) {
-		if(n === array[0]) {
-			index = i;
-			return;
-		}
-	});
-	if(index !== -1) {
-		vueData.panes[0] = paneAry[index];
-		for(var i = 0; i < array.length; i++) {
-			vueData.panes[i] = array[i];
+window.addEventListener("hashchange", function() {
+
+});
+window.addEventListener("DOMContentLoaded", function() {
+	// Get all "navbar-burger" elements
+	const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+	// Check if there are any navbar burgers
+	if ($navbarBurgers.length > 0) {
+
+		// Add a click event on each of them
+		$navbarBurgers.forEach( el => {
+			el.addEventListener('click', () => {
+
+				// Get the target from the "data-target" attribute
+				const target = el.dataset.target;
+				const $target = document.getElementById(target);
+
+				// Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+				el.classList.toggle('is-active');
+				$target.classList.toggle('is-active');
+
+			});
+		});
+	}
+	const sectionTitles = [];
+	for(let x of document.querySelectorAll('#navMenu a')) {
+		sectionTitles.push(x.getAttribute('href').substring(1));
+	}
+	var  hash = document.location.hash;
+	if(hash) {
+		var array = decodeURI(hash.slice(1)).split('/');
+		var index = -1;
+		$.each(sectionTitles, function(i,n) {
+			if(n === array[0]) {
+				index = i;
+				return;
+			}
+		});
+		if(index !== -1) {
+			vueData.panes[0] = sectionTitles[index];
+			for(var i = 0; i < array.length; i++) {
+				vueData.panes[i] = array[i];
+			}
 		}
 	}
-}
-window.addEventListener("DOMContentLoaded", function() {
-	$('#main-menu').css({
-		position:"fixed",
-		top:"10px",
-		left:0
-	});
-	$('<button>メニュー</button>').click(function(){
-		app.showMenu = app.showMenu ? false : true;
-		document.querySelector("#main-menu").style.display = "block";
-	}).appendTo($('#menu'));
 	var  app = new Vue({
 		el:"#app",
 		data: vueData,
